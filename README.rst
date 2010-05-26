@@ -1,0 +1,3 @@
+Django MyUtils
+===============
+A simple reusable django app with some handy utilities I use in many projects...
