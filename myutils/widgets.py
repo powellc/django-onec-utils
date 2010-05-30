@@ -1,8 +1,13 @@
 from django import forms
 from django.utils.safestring import mark_safe
 from django.conf import settings
-from recaptcha.client import captcha
+from django import forms
+from django.db.models import get_model
+from django.utils import simplejson
+from django.utils.safestring import mark_safe
 
+from tagging.models import Tag
+from recaptcha.client import captcha
 
 class ReCaptcha(forms.widgets.Widget):
     recaptcha_challenge_name = 'recaptcha_challenge_field'
@@ -15,13 +20,7 @@ class ReCaptcha(forms.widgets.Widget):
         return [data.get(self.recaptcha_challenge_name, None), 
             data.get(self.recaptcha_response_name, None)]
             
-            from django import forms
-            from django.db.models import get_model
-            from django.utils import simplejson
-            from django.utils.safestring import mark_safe
-            from tagging.models import Tag
 
-            from recipes.models import Recipe
 
  
 def MakeAutoCompleteTagInput(tagged_object):

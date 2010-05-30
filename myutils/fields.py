@@ -4,7 +4,7 @@ from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
 
 from myutils.widgets import ReCaptcha
-from recaptcha import captcha
+from recaptcha.client import captcha
 
 class ReCaptchaField(forms.CharField):
     default_error_messages = {
