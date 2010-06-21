@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='django-myutils',
     version='0.1.0',
-    description='Just some reusable tools.'
+    description='Just some reusable tools.',
     author='Colin Powell',
     author_email='colin.powell@me.com',
     url='http://github.com/powellc/django-myutils/tree/master',
