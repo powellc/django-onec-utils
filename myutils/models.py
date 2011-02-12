@@ -2,6 +2,7 @@ from datetime import *
 import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.localflavor.us.models import USStateField, PhoneNumberField
 from myutils.fields import USZipcodeField
 from myutils.utils import google_lat_long
 
@@ -18,6 +19,7 @@ class USAddressModel(models.Model):
     town=models.CharField(_('Town'), max_length=100)
     state=USStateField(_('State'))
     zipcode=USZipcodeField(_('Zip'), max_length=5)
+    phone=PhoneNumberField(_('phone'), blank=True, null=True)
     lat_long=models.CharField(_('Coordinates'), max_length=255, blank=True, null=True)
 
     class Meta:
