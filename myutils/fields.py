@@ -9,7 +9,7 @@ class CurrencyField(models.DecimalField):
         except AttributeError:
            return None
 
-class ZipCodeField(models.CharField):
+class USZipcodeField(models.CharField):
     ''' US Zipcode Field
 
     A really simple field that just makes sure to pad US zipcodes with zeros if needed.
