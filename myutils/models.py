@@ -1,4 +1,5 @@
 from datetime import *
+import random, string
 import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -6,9 +7,9 @@ from django.contrib.localflavor.us.models import USStateField, PhoneNumberField
 from myutils.fields import USZipcodeField
 from myutils.utils import google_lat_long
 
-class USAddressModel(models.Model):
+class USAddressPhoneMixin(models.Model):
     """
-    Handles models that need to have an address associated with it.
+    Mixin that handles models that need to have an address associated with it.
 
     Note: This is none to sophisticated and would need some fleshing out for int'l applications.
 
@@ -32,7 +33,45 @@ class USAddressModel(models.Model):
             if not self.lat_long:
                 location = "%s +%s +%s" % (self.town, self.state, self.zipcode)
                 self.lat_long = google_lat_long(location)
-        super(USAddressModel, self).save(*args, **kwargs)
+        super(USAddressPhoneMixin, self).save(*args, **kwargs)
+
+
+try:
+    RAND_FIELD_LENGTH=settings.RAND_FIELD_LENGTH
+except:
+    RAND_FIELD_LENGTH = 8
+
+class RandomIDMixin(models.Model):
+    """
+    Taken directly from djangosnippet.org/snippets/814/
+    """
+    id = models.CharField(primary_key=True, max_length=RAND_FIELD_LENGTH)
+    
+    def save(self):
+        if not self.id:
+            self.id = random_id(RAND_FIELD_LENGTH)
+            super(RandomIDMixin, self).save()
+    
+    class Meta:
+        abstract = True
+    
+    # alphabet will become our base-32 character set:
+    alphabet = string.lowercase + string.digits 
+    # We must remove 4 characters from alphabet to make it 32 characters long. We want it to be 32
+    # characters long so that we can use a whole number of random bits to index into it.
+    for loser in 'l1o0': # Choose to remove ones that might be visually confusing
+        i = alphabet.index(loser)
+        alphabet = alphabet[:i] + alphabet[i+1:]
+    
+    def byte_to_base32_chr(byte):
+        return alphabet[byte & 31]
+
+    def random_id(length):
+        # Can easily be converted to use secure random when available
+        # see http://www.secureprogramming.com/?action=view&feature=recipes&recipeid=20
+        random_bytes = [random.randint(0, 0xFF) for i in range(length)]
+        return ''.join(map(byte_to_base32_chr, random_bytes))
+
 
 class StandardMetadata(models.Model):
     """
@@ -56,3 +95,4 @@ class StandardMetadata(models.Model):
     #def delete(self, *args, **kwargs):
     #   self.deleted=True
     #   super(StandardMetadata, self).delete(*args, **kwargs)
+
