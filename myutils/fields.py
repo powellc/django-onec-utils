@@ -15,4 +15,5 @@ class USZipcodeField(models.CharField):
     A really simple field that just makes sure to pad US zipcodes with zeros if needed.
     '''
     def __unicode__(self):
-        return self.rjust(5, '0.)
+        return self.rjust(5, '0')
+
