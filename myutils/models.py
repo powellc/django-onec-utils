@@ -4,8 +4,55 @@ import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.localflavor.us.models import USStateField, PhoneNumberField
+from django.contrib.markup.templatetags import markup
+
 from myutils.fields import USZipcodeField
 from myutils.utils import google_lat_long
+
+MARKUP_HTML = 'h'
+MARKUP_MARKDOWN = 'm'
+MARKUP_REST = 'r'
+MARKUP_TEXTILE = 't'
+MARKUP_OPTIONS = getattr(settings, 'MARKUP_OPTIONS', (
+        (MARKUP_HTML, _('HTML/Plain Text')),
+        (MARKUP_MARKDOWN, _('Markdown')),
+        (MARKUP_REST, _('ReStructured Text')),
+        (MARKUP_TEXTILE, _('Textile'))
+    ))
+MARKUP_DEFAULT = getattr(settings, 'MARKUP_DEFAULT', MARKUP_MARKDOWN)
+
+MARKUP_HELP = _("""Select the type of markup you are using in this article.
+<ul>
+<li><a href="http://daringfireball.net/projects/markdown/basics" target="_blank">Markdown Guide</a></li>
+<li><a href="http://docutils.sourceforge.net/docs/user/rst/quickref.html" target="_blank">ReStructured Text Guide</a></li>
+<li><a href="http://thresholdstate.com/articles/4312/the-textile-reference-manual" target="_blank">Textile Guide</a></li>
+</ul>""")
+
+class MarkupMixin(models.Model):
+    markup = models.CharField(max_length=1, choices=MARKUP_OPTIONS, default=MARKUP_DEFAULT, help_text=MARKUP_HELP)
+
+    class Meta:
+        abstract=True
+
+    def save(self, *args, **kwargs):
+        #self.do_render_markup()
+        super(MarkupMixin, self).save(*args, **kwargs)
+
+    def do_render_markup(self):
+        """Turns any markup into HTML"""
+
+        original = self.rendered_content
+        if self.markup == MARKUP_MARKDOWN:
+            self.rendered_content = markup.markdown(self.content)
+        elif self.markup == MARKUP_REST:
+            self.rendered_content = markup.restructuredtext(self.content)
+        elif self.markup == MARKUP_TEXTILE:
+            self.rendered_content = markup.textile(self.content)
+        else:
+            self.rendered_content = self.content
+
+        return (self.rendered_content != original)
+
 
 class USAddressPhoneMixin(models.Model):
     """
