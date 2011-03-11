@@ -28,30 +28,65 @@ MARKUP_HELP = _("""Select the type of markup you are using in this article.
 <li><a href="http://thresholdstate.com/articles/4312/the-textile-reference-manual" target="_blank">Textile Guide</a></li>
 </ul>""")
 
+class Options(object):
+    """ Class handling per-model markup options. """
+    rendered_field = None
+    source_field = None
+
+    def __init__(self, opts):
+        for key, value in opts.__dict__.iteritems():
+            setattr(self, key, value)
+
+class MarkupBase(models.base.ModelBase):
+    def __init__(cls, name, bases, attrs):
+        parents = [b for b in bases if isinstance(b, MarkupBase)]
+        if not parents:
+            return
+        ''' Parse MarkupOptions and store them as under _markup on the object. '''
+        user_opts = getattr(cls, 'MarkupOptions', None)
+        opts = Options(user_opts)
+        setattr(cls, '_markup', opts)
+
 class MarkupMixin(models.Model):
     markup = models.CharField(max_length=1, choices=MARKUP_OPTIONS, default=MARKUP_DEFAULT, help_text=MARKUP_HELP)
+
+    __metaclass__= MarkupBase
 
     class Meta:
         abstract=True
 
+    class MarkupOptions:
+        pass
+
     def save(self, *args, **kwargs):
-        #self.do_render_markup()
+        ''' Only try to pre-render if the options have been set.'''
+        if self._markup.rendered_field and self._markup.source_field:
+            self.do_render_markup()
         super(MarkupMixin, self).save(*args, **kwargs)
 
     def do_render_markup(self):
         """Turns any markup into HTML"""
 
-        original = self.rendered_content
+        original = self._rendered
         if self.markup == MARKUP_MARKDOWN:
-            self.rendered_content = markup.markdown(self.content)
+            rendered = markup.markdown(self._source)
         elif self.markup == MARKUP_REST:
-            self.rendered_content = markup.restructuredtext(self.content)
+            rendered = markup.restructuredtext(self._source)
         elif self.markup == MARKUP_TEXTILE:
-            self.rendered_content = markup.textile(self.content)
+            rendered = markup.textile(self._source)
         else:
-            self.rendered_content = self.content
+            rendered = self._source
 
-        return (self.rendered_content != original)
+        setattr(self, self._markup.rendered_field, rendered)
+        return (rendered != original)
+
+    @property
+    def _source(self):
+        return getattr(self, self._markup.source_field)
+
+    @property
+    def _rendered(self):
+        return getattr(self, self._markup.rendered_field)
 
 
 class USAddressPhoneMixin(models.Model):
