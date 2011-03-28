@@ -1,4 +1,5 @@
 from datetime import *
+import logging
 import random, string
 import settings
 from django.db import models
@@ -61,6 +62,7 @@ class MarkupMixin(models.Model):
     def save(self, *args, **kwargs):
         ''' Only try to pre-render if the options have been set.'''
         if self._markup.rendered_field and self._markup.source_field:
+            logging.debug('Rendering markup for %s to %s.' % (self._markup.source_field, self._markup.rendered_field))
             self.do_render_markup()
         super(MarkupMixin, self).save(*args, **kwargs)
 
@@ -110,11 +112,13 @@ class USAddressPhoneMixin(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.lat_long:
+            logging.debug('myutils.models: USAddressPhoneMixin says "Looking up latitude and longitude for %s %s, %s."' % (self.address, self.town, self.state))
             location = "%s +%s +%s +%s" % (self.address, self.town, self.state, self.zipcode)
             self.lat_long = google_lat_long(location)
             if not self.lat_long:
                 location = "%s +%s +%s" % (self.town, self.state, self.zipcode)
                 self.lat_long = google_lat_long(location)
+            logging.debug('myutils.models: USAddressPhoneMixin says "Latitude and longitude set to %s for %s %s, %s."' % (self.lat_long, self.address, self.town, self.state))
         super(USAddressPhoneMixin, self).save(*args, **kwargs)
 
 
