@@ -60,6 +60,7 @@ class MarkupMixin(models.Model):
         pass
 
     def save(self, *args, **kwargs):
+        logging.debug('This mixin is deprecated in favor of the django-markup-mixin project, found on github.')
         ''' Only try to pre-render if the options have been set.'''
         if self._markup.rendered_field and self._markup.source_field:
             logging.debug('Rendering markup for %s to %s.' % (self._markup.source_field, self._markup.rendered_field))
