@@ -7,8 +7,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.localflavor.us.models import USStateField, PhoneNumberField
 from django.contrib.markup.templatetags import markup
 
-from myutils.fields import USZipcodeField
-from myutils.utils import google_lat_long
+from onec_utils.fields import USZipcodeField
+from onec_utils.utils import google_lat_long
 
 MARKUP_HTML = 'h'
 MARKUP_MARKDOWN = 'm'
@@ -113,13 +113,13 @@ class USAddressPhoneMixin(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.lat_long:
-            logging.debug('myutils.models: USAddressPhoneMixin says "Looking up latitude and longitude for %s %s, %s."' % (self.address, self.town, self.state))
+            logging.debug('onec_utils.models: USAddressPhoneMixin says "Looking up latitude and longitude for %s %s, %s."' % (self.address, self.town, self.state))
             location = "%s +%s +%s +%s" % (self.address, self.town, self.state, self.zipcode)
             self.lat_long = google_lat_long(location)
             if not self.lat_long:
                 location = "%s +%s +%s" % (self.town, self.state, self.zipcode)
                 self.lat_long = google_lat_long(location)
-            logging.debug('myutils.models: USAddressPhoneMixin says "Latitude and longitude set to %s for %s %s, %s."' % (self.lat_long, self.address, self.town, self.state))
+            logging.debug('onec_utils.models: USAddressPhoneMixin says "Latitude and longitude set to %s for %s %s, %s."' % (self.lat_long, self.address, self.town, self.state))
         super(USAddressPhoneMixin, self).save(*args, **kwargs)
 
 
