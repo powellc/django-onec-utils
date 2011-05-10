@@ -1,24 +1,24 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='django-markup-mixin',
-    version=__import__('markup_mixin').__version__,
+    name='django-onec-utils',
+    version=__import__('onec_utils').__version__,
     license="BSD",
 
     install_requires = [],
 
-    description='Add pre-rendered markup fields to your django models with the least work.',
-    long_description=open('README.md').read(),
+    description='A collection of misc. tools for One Cardinal\'s work.',
+    long_description=open('README.rst').read(),
 
     author='Colin Powell',
     author_email='colin@onecardinal.com',
 
-    url='http://github.com/powellc/django-markup-mixin',
-    download_url='http://github.com/powellc/django-markup-mixin/downloads',
+    url='http://github.com/powellc/django-onec-utils',
+    download_url='http://github.com/powellc/django-onec-utils/downloads',
 
     include_package_data=True,
 
-    packages=['markup_mixin'],
+    packages=['onec_utils'],
 
     zip_safe=True,
     classifiers=[
