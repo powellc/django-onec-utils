@@ -8,7 +8,7 @@ setup(
     install_requires = [],
 
     description='A collection of misc. tools for One Cardinal\'s work.',
-    long_description=open('README.rst').read(),
+    long_description=open('README').read(),
 
     author='Colin Powell',
     author_email='colin@onecardinal.com',
